@@ -12,18 +12,37 @@
 
 #include "../include/fdf.h"
 
-/*int		ft_write_x(void)
-{
-	ft_putchar('P');
-	return (0);
-}
-*/
-/*int		exit_x(void)
+int		ft_exit(void)
 {
 	exit(1);
 }
-*/
-/*void segment(void *win, void *mlx, int x0, int y0, int x1, int y1, int color)
+
+void	ft_free_list(t_point *begin)
+{
+	t_point	*tmp;
+
+	tmp = begin;
+	while (begin)
+	{
+		tmp = begin;
+		begin = begin->next;
+		free(tmp);
+	}
+}
+
+int 	ft_key_hook(int keycode, t_point *list)
+{
+	if (keycode == 53)
+//Exit program if ESC
+	{
+		mlx_destroy_window(list->mlx, list->win);
+		ft_free_list(list);
+		ft_exit();
+	}
+	return (1);
+}
+
+void ft_bresen(void *win, void *mlx, int x0, int y0, int x1, int y1, int color)
 {
   int dx = abs(x1 - x0);
   int dy = abs(y1 - y0);
@@ -66,115 +85,70 @@
       mlx_pixel_put(mlx, win, x, y, color);
     }
   }
-}*/
-
-t_point	*ft_add_node(t_point *current, int x, int y, int att)
-{
-	t_point	*new;
-
-	if (!x && !y)
-	{
-		current->x = x;
-		current->y = y;
-		current->attitude = att;
-		current->next = NULL;
-		return (current);
-	}
-	if ((new = malloc(sizeof(t_point))) == NULL)
-		return (NULL);
-	new->x = x;
-	new->y = y;
-	new->attitude = att;
-	new->next = NULL;
-	current->next = new;
-	return (new);
 }
 
-t_point	*ft_make_line(t_point *begin, char *line, int y)
+void	ft_input_to_draw(t_point *first, t_point *second)
 {
-	t_point	*current;
-	int 	i;
-	int 	x;
-	int 	att;
+	int 	x_first;
+	int 	x_second;
+	int 	y_first;
+	int 	y_second;	
 
-	att = 0;
-	x = 0;
-	i = 0;
-	current = begin;
-	while (line[i])
+	x_first = first->x PX;
+	y_first = first->y PX;
+	x_second = second->x PX;
+	y_second = second->y PX;
+	ft_bresen(first->win, first->mlx, x_first, y_first, x_second, y_second, 100140111);
+}
+
+void	ft_draw(t_point *begin)
+{
+	t_point *first;
+	t_point	*second;
+
+	first = begin;
+	while (first->next)
 	{
-		if (line[i] >= '0' && line[i] < '9')
+		if (first->y == first->next->y)
+			ft_input_to_draw(first, first->next);
+		second = first->next;
+		while (second)
 		{
-			att = ft_atoi(&line[i]);
-//Sending pointer to start of number
-			current = ft_add_node(current, x, y, att);
-//If 1 number we just complete struct, but if not we create node and complete it
-//Return new list
-			while (line[i] >= '0' && line[i] < '9')
-				i++;
+			if (first->x == second->x)
+				ft_input_to_draw(first, second);
+			second = second->next;
 		}
-		while (line[i] == ' ')
-			i++;
-		x++;
-//Every time we add only one number
+		first = first->next;
 	}
-	return (current);
-}
 
-t_point		*ft_read(char *file)
-{
-	int		fd;
-	char	*line;
-	char	*buff;
-	int 	y;
-	t_point	*head;
-	char	*tmp;
-	t_point	*current;
-
-	y = 0;
-	buff = ft_strdup("");
-	line = NULL;
-	if ((fd = open(file, O_RDONLY)) == -1)
-	{
-		ft_putendl("Open file fail (Error -1)");
-		return (NULL);
-	}
-	head = malloc(sizeof(t_point));
-//Create chained list
-	current = head;
-//Pointer to the list we didnt touch
-	while ((get_next_line(fd, &line)) > 0)
-//Make buff with EOL
-//Every time we change Y by 1
-	{
-		tmp = buff;
-		buff = ft_strjoin(buff, line);
-		buff = ft_strjoin(buff, "\n");
-		free(tmp);
-		current = ft_make_line(current, line, y);
-//Making chained list with current line
-//And return last node of list
-		y++;
-	}
-	return (head);
 }
 
 int		main(int ac, char **av)
 {
-	char 	*buff;
-	t_point	*head;
+	t_point	*list;
 	int 	loop;
+	void	*mlx;
+	void	*win;
 
 	loop = 1;
-	buff = NULL;
+	if (!(mlx = mlx_init()))
+	{
+		ft_putendl("Fail to connect to mlx");
+		return (1);
+	}
+	if (!(win = mlx_new_window(mlx, 1440, 800, "FdF")))
+	{
+		ft_putendl("Fail to open window");
+		return (0);
+	}
 	if (ac < 2)
 		return (1);
-	if ((head = ft_read(av[1])) == NULL)
+	if ((list = ft_read(mlx, win, av[1])) == NULL)
 		return (1);
-	while (head)
+	/*	while (head)
 	{
-		ft_putnbr(head->attitude);
-		if (head->attitude > 9)
+		ft_putnbr(head->z);
+		if (head->z > 9)
 			ft_putchar(' ');
 		else
 			ft_putstr("  ");
@@ -182,36 +156,12 @@ int		main(int ac, char **av)
 		if (loop % 19 == 0)
 			ft_putchar('\n');
 		loop++;
-	}
-	/*void	*mlx_ptr;
-	void	*win_ptr;
-	int		i;
-
-	i = 10;
-	if ((mlx_ptr = mlx_init()) == NULL)
-	{
-		ft_putendl("Fail to connect");
-		return (1);
-	}
-	win_ptr = mlx_new_window(mlx_ptr, 500, 500, "Hello world");
-	if (!win_ptr)
-	{
-		ft_putendl("Fail to open window");
-		return (0);
 	}*/
-//	mlx_key_hook(win_ptr, ft_write_x, NULL);
-/*	mlx_string_put(mlx_ptr, win_ptr, 50, 100, 100255000, "Hello world");
-	while (i < 190)
-	{
-		mlx_pixel_put(mlx_ptr, win_ptr, i, 20, 100255000);
-		i++;
-	}*/
+	mlx_string_put(mlx, win, 30, 30, 100255000, "Press ESC to exit");
 
-
-	/*mlx_hook(win_ptr, 17, 1L << 17, exit_x, NULL);
-	segment(win_ptr, mlx_ptr, 0, 0, 50, 50, 100255000);
-	segment(win_ptr, mlx_ptr, 50, 50, 250, 250, 100255000);
-	segment(win_ptr, mlx_ptr, 250, 250, 70, 140, 100255000);
-	mlx_loop(mlx_ptr);*/
+	mlx_hook(win, 17, 1L << 17, ft_exit, NULL);
+	mlx_key_hook(win, ft_key_hook, list);
+	ft_draw(list);
+	mlx_loop(mlx);
 	return (0);
 }

@@ -12,6 +12,7 @@
 
 #ifndef FDF_H
 # define FDF_H
+# define PX * 30 + 200
 
 # include "../libft/libft.h"
 # include <mlx.h>
@@ -21,8 +22,14 @@ typedef struct 		s_point
 {
 	int				y;
 	int				x;
-	int				attitude;
+	int				z;
+	void			*mlx;
+	void			*win;
 	struct s_point	*next;
 }					t_point;
+
+t_point	*ft_add_node(void *mlx, void *win, t_point *current, int x, int y, int z);
+t_point	*ft_make_line(void *mlx, void *win, t_point *begin, char *line, int y);
+t_point	*ft_read(void *mlx, void *win, char *file);
 
 #endif

@@ -13,6 +13,7 @@
 NAME	= fdf
 
 SRC		= src/main.c \
+		  src/read.c
 
 OBJ		= $(patsubst src/%.c,obj/%.o,$(SRC))
 .SILENT:
