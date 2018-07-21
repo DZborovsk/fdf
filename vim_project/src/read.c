@@ -1,9 +1,9 @@
 
 #include "../include/fdf.h"
 
-t_point	*ft_add_node(void *mlx, void *win, t_point *current, int x, int y, int z)
+t_coord	*ft_add_node(t_coord *current, int x, int y, int z)
 {
-	t_point	*new;
+	t_coord	*new;
 
 	if (!x && !y)
 	{
@@ -11,25 +11,21 @@ t_point	*ft_add_node(void *mlx, void *win, t_point *current, int x, int y, int z
 		current->y = y;
 		current->z = z;
 		current->next = NULL;
-		current->mlx = mlx;
-		current->win = win;
 		return (current);
 	}
-	if ((new = malloc(sizeof(t_point))) == NULL)
+	if ((new = malloc(sizeof(t_coord))) == NULL)
 		return (NULL);
 	new->x = x;
 	new->y = y;
 	new->z = z;
 	new->next = NULL;
 	current->next = new;
-	new->mlx = mlx;
-	new->win = win;
 	return (new);
 }
 
-t_point	*ft_make_line(void *mlx, void *win, t_point *begin, char *line, int y)
+t_coord	*ft_make_line(t_coord *begin, char *line, int y)
 {
-	t_point	*current;
+	t_coord	*current;
 	int 	i;
 	int 	x;
 	int 	z;
@@ -44,7 +40,7 @@ t_point	*ft_make_line(void *mlx, void *win, t_point *begin, char *line, int y)
 		{
 			z = ft_atoi(&line[i]);
 //Sending pointer to start of number
-			current = ft_add_node(mlx, win, current, x, y, z);
+			current = ft_add_node(current, x, y, z);
 //If 1 number we just complete struct, but if not we create node and complete it
 //Return new list
 			while (line[i] >= '0' && line[i] < '9')
@@ -58,15 +54,16 @@ t_point	*ft_make_line(void *mlx, void *win, t_point *begin, char *line, int y)
 	return (current);
 }
 
-t_point	*ft_read(void *mlx, void *win, char *file)
+t_st	*ft_read(void *mlx, void *win, char *file)
 {
 	int		fd;
 	char	*line;
 	char	*buff;
 	int 	y;
-	t_point	*head;
+	t_coord	*head;
 	char	*tmp;
-	t_point	*current;
+	t_coord	*current;
+	t_st	*st;
 
 	y = 0;
 	buff = ft_strdup("");
@@ -76,9 +73,13 @@ t_point	*ft_read(void *mlx, void *win, char *file)
 		ft_putendl("Open file fail (Error -1)");
 		return (NULL);
 	}
-	head = malloc(sizeof(t_point));
+	st = malloc(sizeof(t_st));
+	head = malloc(sizeof(t_coord));
+	st->mlx = mlx;
+	st->win = win;
+	st->list = head;
 //Create chained list
-	current = head;
+	current = st->list;
 //Pointer to the list we didnt touch
 	while ((get_next_line(fd, &line)) > 0)
 //Make buff with EOL
@@ -88,10 +89,10 @@ t_point	*ft_read(void *mlx, void *win, char *file)
 		buff = ft_strjoin(buff, line);
 		buff = ft_strjoin(buff, "\n");
 		free(tmp);
-		current = ft_make_line(mlx, win, current, line, y);
+		current = ft_make_line(current, line, y);
 //Making chained list with current line
 //And return last node of list
 		y++;
 	}
-	return (head);
+	return (st);
 }

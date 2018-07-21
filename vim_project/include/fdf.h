@@ -12,24 +12,35 @@
 
 #ifndef FDF_H
 # define FDF_H
-# define PX * 30 + 200
 
 # include "../libft/libft.h"
 # include <mlx.h>
 # include <math.h>
 
-typedef struct 		s_point
+# define PX * 40 + 300
+# define PX1 * 40 + 300
+# define TEXT_COLOR 0xCD3700
+# define ROSE 0xDB7093
+# define RED 0xCD3700
+# define BLUE 0xa020f0
+
+typedef struct 		s_coord
 {
 	int				y;
 	int				x;
 	int				z;
+	struct s_coord	*next;
+}					t_coord;
+
+typedef struct 		s_st
+{
+	t_coord			*list;
 	void			*mlx;
 	void			*win;
-	struct s_point	*next;
-}					t_point;
+}					t_st;
 
-t_point	*ft_add_node(void *mlx, void *win, t_point *current, int x, int y, int z);
-t_point	*ft_make_line(void *mlx, void *win, t_point *begin, char *line, int y);
-t_point	*ft_read(void *mlx, void *win, char *file);
+t_coord	*ft_add_node(t_coord *current, int x, int y, int z);
+t_coord	*ft_make_line(t_coord *begin, char *line, int y);
+t_st	*ft_read(void *mlx, void *win, char *file);
 
 #endif
