@@ -12,37 +12,6 @@
 
 #include "../include/fdf.h"
 
-int		ft_exit(void)
-{
-	exit(1);
-}
-
-void	ft_free_list(t_coord *begin)
-{
-	t_coord	*tmp;
-
-	tmp = begin;
-	while (begin)
-	{
-		tmp = begin;
-		begin = begin->next;
-		free(tmp);
-	}
-}
-
-int 	ft_key_hook(int keycode, t_st *st)
-{
-	if (keycode == 53)
-//Exit program if ESC
-	{
-		mlx_destroy_window(st->mlx, st->win);
-		ft_free_list(st->list);
-		free(st);
-		ft_exit();
-	}
-	return (1);
-}
-
 void ft_bresen(void *win, void *mlx, int x0, int y0, int x1, int y1, int color)
 {
   int dx = abs(x1 - x0);
@@ -88,6 +57,23 @@ void ft_bresen(void *win, void *mlx, int x0, int y0, int x1, int y1, int color)
   }
 }
 
+void	ft_init_coord_par(t_st *st)
+{
+	t_coord	*current;
+	float	tmp;
+
+	current = st->list;
+	tmp = 0;
+	while (current)
+	{
+		tmp = 500 + (current->x * 50) * st->zoom + CONST *	(current->z * -3) * st->zoom;
+		current->x = (int)(tmp + 0.5);
+		tmp = 300 + (current->y * 50) * st->zoom + (CONST / 2) * (current->z * -3) * st->zoom;
+		current->y = (int)(tmp + 0.5);
+		current = current->next;
+	}
+}
+
 void	ft_input_to_draw(t_st *st, t_coord *first, t_coord *second)
 {
 	int 	x_first;
@@ -95,148 +81,112 @@ void	ft_input_to_draw(t_st *st, t_coord *first, t_coord *second)
 	int 	y_first;
 	int 	y_second;	
 
-	x_first = first->x PX;
-	y_first = first->y PX;
-	x_second = second->x PX;
-	y_second = second->y PX;
-	if (first->z > 0)
-	{
-//		x_first = x_first + first->z * 0.2;
-		y_first = y_first - first->z;
-	}
-	if (second->z > 0 && first->z == 0)
-	{
-		y_second = y_second - second->z;
-	}
-	if (first->z == second->z)
-	{
-		
-		y_second = y_second - second->z;
-	}
-
-
-/*	if (first->z > 0)
-	{
-//		x_first = x_first + first->z * 0.2;
-		x_first = x_first - first->z;
-	}
-*/	
-
-//I need to modify not x y here!! I need to modify it in my list
-	// if (first->z > 0 && second->z > 0)
-	// 	ft_bresen(st->win, st->mlx, x_first-5, y_first - 10, x_second-5, y_second - 10, ROSE);
-	// else if (second->z > 0 && first->z == 0)
-	// 	ft_bresen(st->win, st->mlx, x_first, y_first, x_second, y_second - 10, RED);
-	// else
+//	ft_init_coord_par(st);
+	x_first = first->x;
+	y_first = first->y;
+	x_second = second->x;
+	y_second = second->y;
 	ft_bresen(st->win, st->mlx, x_first, y_first, x_second, y_second, ROSE);
 }
 
-/*void	ft_change_proection(t_coord *b)
+int 	ft_count_width(t_st *st)
 {
 	t_coord	*current;
 
-	current = b;
-	while (current)
-	{
-		if (current->z > 0)
-		{
-			current->x = current->x + (current->z * 0.7);
-			current->y = current->y - (current->z * 0.2);
-		}
+	current = st->list;
+	while (current->next && current->y == current->next->y)
 		current = current->next;
-	}
-}*/
+	return (current->x);
+}
 
-void	ft_draw(t_st *st, t_coord *begin)
+void	ft_draw(t_st *st)
 {
 	t_coord *first;
 	t_coord	*second;
 
-	first = begin;
-//	ft_change_proection(begin);
+	first = st->list;
+	
+//	ft_putnbr(st->w);
+//	ft_putnbr(st->list->x);
+	ft_init_coord_par(st);
+	st->w = ft_count_width(st);
+//	ft_putnbr(st->w);
+//	ft_putchar('\n');
 	while (first->next)
 	{
-		if (first->y == first->next->y)
+		if (first->y == first->next->y || first->x != st->w)
 			ft_input_to_draw(st, first, first->next);
+//		ft_putnbr(first->y);
+//		ft_putchar('\n');
 		second = first->next;
 		while (second)
 		{
 			if (first->x == second->x)
+			{
 				ft_input_to_draw(st, first, second);
+				break ;
+			}
 			second = second->next;
 		}
 		first = first->next;
 	}
-
 }
-
-void	ft_text_instructions(void *mlx, void *win)
-{
-	mlx_string_put(mlx, win, 35, 35, TEXT_COLOR, "Press ESC to exit");
-	mlx_string_put(mlx, win, 35, 55, TEXT_COLOR, "Move = ^ v < >");
-	mlx_string_put(mlx, win, 35, 75, TEXT_COLOR,
-		"Zoom = + - or scrolling");
-	mlx_string_put(mlx, win, 35, 95, TEXT_COLOR, "Isometric = i");
-	mlx_string_put(mlx, win, 35, 115, TEXT_COLOR, "Parallel = p");
-	mlx_string_put(mlx, win, 35, 135, TEXT_COLOR, "Increase z = *");
-	mlx_string_put(mlx, win, 35, 155, TEXT_COLOR, "Decrease z = /");
-	mlx_string_put(mlx, win, 35, 175, TEXT_COLOR, "Increase x = 1");
-	mlx_string_put(mlx, win, 35, 195, TEXT_COLOR, "Decrease x = 2");
-	mlx_string_put(mlx, win, 35, 215, TEXT_COLOR, "Increase z = 4");
-	mlx_string_put(mlx, win, 35, 235, TEXT_COLOR, "Decrease z = 5");
-	mlx_string_put(mlx, win, 35, 255, TEXT_COLOR, "Change color = .");
-}
-
-void	ft_key_control(t_st *st)
-{
-	mlx_hook(st->win, 17, 1L << 17, ft_exit, NULL);
-	mlx_key_hook(st->win, ft_key_hook, st);
-}
+/*	while (second->next)
+	{
+		while (first->next)
+		{
+			ft_input_to_draw(st, first, first->next);
+			first = first->next;
+		}
+		if (second->x == second->next->x)
+			ft_input_to_draw(st, second, second->next);
+		second = second->next;
+	}
+*/
+/*	while (first->next)
+	{
+		if (_ % first->x!= 0)
+			ft_input_to_draw(st, first, first->next);
+		if (i < (first->y - 1) * first->x)
+			ft_input_to_draw(st, first, first->next);
+		first = first->next;
+	}
+*/
 
 int		main(int ac, char **av)
 {
-	t_st	*st;
-	int 	loop;
-	void	*mlx;
-	void	*win;
-
-	loop = 1;
-	if (!(mlx = mlx_init()))
-	{
-		ft_putendl("Fail to connect to mlx");
-		return (1);
-	}
-	if (!(win = mlx_new_window(mlx, 1440, 800, "fdf")))
-	{
-		ft_putendl("Fail to open window");
-		return (0);
-	}
+	t_st 	*st;
+//	int 	loop = 1;
 	if (ac < 2)
+//Checking file name
 	{
 		ft_putendl("File name missing (use: ./fdf file_name)");
 		return (1);
 	}
-	if ((st = ft_read(mlx, win, av[1])) == NULL)
-//Creating chained list in struct s_st->list
+	if (!(st = ft_init_st()))
+//Creating stuct st and init it
+//Creating win
 		return (1);
-	/*	while (head)
+	ft_read(st, av[1]);
+/*	while (st->list)
 	{
-		ft_putnbr(head->z);
-		if (head->z > 9)
+		ft_putnbr(st->list->z);
+		if (st->list->z > 9)
 			ft_putchar(' ');
 		else
 			ft_putstr("  ");
-		head = head->next;
+		st->list = st->list->next;
 		if (loop % 19 == 0)
 			ft_putchar('\n');
 		loop++;
 	}*/
-	ft_text_instructions(mlx, win);
+//Creating chained list in struct s_st->list
+	ft_text_instructions(st->mlx, st->win);
 //Display all instructions in left top corner
 	ft_key_control(st);
 //Key setup
-	ft_draw(st, st->list);
+	ft_draw(st);
 //Draw chained list
-	mlx_loop(mlx);
+	mlx_loop(st->mlx);
 	return (0);
 }

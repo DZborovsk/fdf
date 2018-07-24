@@ -17,8 +17,7 @@
 # include <mlx.h>
 # include <math.h>
 
-# define PX * 40 + 300
-# define PX1 * 40 + 300
+# define CONST 0.5
 # define TEXT_COLOR 0xCD3700
 # define ROSE 0xDB7093
 # define RED 0xCD3700
@@ -37,10 +36,22 @@ typedef struct 		s_st
 	t_coord			*list;
 	void			*mlx;
 	void			*win;
+	float			zoom;
+	int				w_win;
+	int				h_win;
+	int 			w;
 }					t_st;
 
 t_coord	*ft_add_node(t_coord *current, int x, int y, int z);
 t_coord	*ft_make_line(t_coord *begin, char *line, int y);
-t_st	*ft_read(void *mlx, void *win, char *file);
+void 	ft_read(t_st *st, char *file);
+void	ft_verif_value(t_st *st);
+t_st	*ft_init_st(void);
+void	ft_key_control(t_st *st);
+void	ft_text_instructions(void *mlx, void *win);
+int 	ft_key_hook(int keycode, t_st *st);
+//int		ft_zoom(int keycode, t_st *st);
+void	ft_free_list(t_coord *begin);
+int		ft_exit(void);
 
 #endif

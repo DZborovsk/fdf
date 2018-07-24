@@ -54,30 +54,38 @@ t_coord	*ft_make_line(t_coord *begin, char *line, int y)
 	return (current);
 }
 
-t_st	*ft_read(void *mlx, void *win, char *file)
+void	ft_verif_value(t_st *st)
+{
+	t_coord	*current;
+
+	current = st->list;
+	while (current)
+	{
+		if (current->z > 1000 || current->z < -1000)
+		{
+			mlx_destroy_window(st->mlx, st->win);
+			ft_free_list(st->list);
+			free(st);
+			ft_exit();
+		}
+		current = current->next;
+	}
+}
+
+void	ft_read(t_st *st, char *file)
 {
 	int		fd;
 	char	*line;
 	char	*buff;
 	int 	y;
-	t_coord	*head;
 	char	*tmp;
 	t_coord	*current;
-	t_st	*st;
 
 	y = 0;
 	buff = ft_strdup("");
 	line = NULL;
 	if ((fd = open(file, O_RDONLY)) == -1)
-	{
 		ft_putendl("Open file fail (Error -1)");
-		return (NULL);
-	}
-	st = malloc(sizeof(t_st));
-	head = malloc(sizeof(t_coord));
-	st->mlx = mlx;
-	st->win = win;
-	st->list = head;
 //Create chained list
 	current = st->list;
 //Pointer to the list we didnt touch
@@ -94,5 +102,31 @@ t_st	*ft_read(void *mlx, void *win, char *file)
 //And return last node of list
 		y++;
 	}
+	ft_verif_value(st);
+}
+
+t_st	*ft_init_st(void)
+//Creating stuct st and init it
+{
+	t_st	*st;
+
+	if (!(st = malloc(sizeof(t_st))))
+		return (NULL);
+	if (!(st->mlx = mlx_init()))
+	{
+		ft_putendl("Fail to connect to mlx");
+		return (NULL);
+	}
+	st->w_win = 1600;
+	st->h_win = 1000;
+	st->w = 0;
+	st->zoom = 1;
+	if (!(st->win = mlx_new_window(st->mlx, st->w_win, st->h_win, "fdf")))
+	{
+		ft_putendl("Fail to open window");
+		return (NULL);
+	}
+	if (!(st->list = malloc(sizeof(t_coord))))
+		return (NULL);
 	return (st);
 }
