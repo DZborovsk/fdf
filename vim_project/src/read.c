@@ -117,11 +117,9 @@ t_st	*ft_init_st(void)
 		ft_putendl("Fail to connect to mlx");
 		return (NULL);
 	}
-	st->w_win = 1600;
-	st->h_win = 1000;
 	st->w = 0;
 	st->zoom = 1;
-	if (!(st->win = mlx_new_window(st->mlx, st->w_win, st->h_win, "fdf")))
+	if (!(st->win = mlx_new_window(st->mlx, 1800, 1200, "FdF")))
 	{
 		ft_putendl("Fail to open window");
 		return (NULL);

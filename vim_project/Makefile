@@ -15,7 +15,8 @@ NAME	= fdf
 SRC		= src/main.c \
 		  src/read.c \
 		  src/hook.c \
-		  src/exit.c
+		  src/exit.c \
+		  src/draw.c
 
 OBJ		= $(patsubst src/%.c,obj/%.o,$(SRC))
 .SILENT:

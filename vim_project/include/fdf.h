@@ -36,10 +36,18 @@ typedef struct 		s_st
 	t_coord			*list;
 	void			*mlx;
 	void			*win;
+	void			*img;
 	float			zoom;
-	int				w_win;
-	int				h_win;
-	int 			w;
+	int				w;
+	int				h;
+	int				z;
+	int 			rx;
+	int 			ry;
+	int 			rz;
+	int 			right;
+	int 			top;
+	int 			color;
+	int 			*grid;
 }					t_st;
 
 t_coord	*ft_add_node(t_coord *current, int x, int y, int z);
@@ -53,5 +61,10 @@ int 	ft_key_hook(int keycode, t_st *st);
 //int		ft_zoom(int keycode, t_st *st);
 void	ft_free_list(t_coord *begin);
 int		ft_exit(void);
+void	ft_draw(t_st *st);
+int 	ft_count_width(t_st *st);
+void	ft_input_to_draw(t_st *st, t_coord *first, t_coord *second);
+void	ft_init_coord_par(t_st *st);
+void ft_bresen(void *win, void *mlx, int x0, int y0, int x1, int y1, int color);
 
 #endif
