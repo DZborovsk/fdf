@@ -79,10 +79,15 @@ int		ft_copy_line(char *str, char *clear, char **line)
 			return (1);
 		}
 		else
+		{
+			free(str);
+			free(clear);
 			return (0);
+		}
 	}
 	*line = ft_strsub(str, 0, (ft_strchr(str, '\n') - str));
 	free(str);
+	free(clear);
 	return (1);
 }
 

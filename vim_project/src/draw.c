@@ -1,168 +1,117 @@
 #include "../include/fdf.h"
 
-void ft_bresen(void *win, void *mlx, int x0, int y0, int x1, int y1, int color)
+
+void  ft_put_pixel_to_img(t_st *fdf, int x, int y, int color)
 {
-  int dx = abs(x1 - x0);
-  int dy = abs(y1 - y0);
-  int sx = x1 >= x0 ? 1 : -1;
-  int sy = y1 >= y0 ? 1 : -1;
-  
-  if (dy <= dx)
+  if (x > 0 && x < 1600 && y > 0 && y < 1000)
+    fdf->grid[y * 1600 + x] = color;
+}
+
+static  t_coor ft_rotate(t_coor c, t_st fdf, t_coor ctr)
+{
+  t_coor c0;
+  t_coor c1;
+  t_coor c2;
+
+  c0.x = c.x;
+  c0.y = (c.y - ctr.y) * cos(fdf.rx) - (c.z - ctr.z) * sin(fdf.rx) + ctr.y;
+  c0.z = (c.z - ctr.z) * cos(fdf.rx) - (c.y - ctr.y) * sin(fdf.rx) + ctr.z;
+  c1.x = (c0.x - ctr.x) * cos(fdf.ry) - (c0.z - ctr.z) * sin(fdf.ry) + ctr.x;
+  c1.y = c0.y;
+  c1.z = (c0.z - ctr.z) * cos(fdf.ry) + (c0.x - ctr.x) * sin(fdf.ry) + ctr.z;
+  c2.x = (c1.x - ctr.x) * cos(fdf.rz) + (c1.y - ctr.y) * sin(fdf.rz) + ctr.x;
+  c2.y = (c1.y - ctr.y) * cos(fdf.rz) - (c1.x - ctr.x) * sin(fdf.rz) + ctr.y;
+  return (c2);
+}
+
+static  void  ft_draw_line(t_st fdf, t_coor c1, t_coor c2)
+{
+  t_coor d;
+  int   sx;
+  int   sy;
+  int   err;
+
+  d.x = abs(c2.x - c1.x);
+  d.y = abs(c2.y - c1.y);
+  sx = c1.x < c2.x ? 1 : -1;
+  sy = c1.y < c2.y ? 1 : -1;
+  err = d.x - d.y;
+  ft_put_pixel_to_img(&fdf, c1.x, c1.y, fdf.color);
+  while (c1.x != c2.x || c1.y != c2.y)
   {
-    int d = (dy << 1) - dx;
-    int d1 = dy << 1;
-    int d2 = (dy - dx) << 1;
-    mlx_pixel_put(mlx, win, x0, y0, color);
-    for(int x = x0 + sx, y = y0, i = 1; i <= dx; i++, x += sx)
+    ft_put_pixel_to_img(&fdf, c1.x, c1.y, fdf.color);
+    if (err * 2 > -d.y)
     {
-      if ( d >0)
-      {
-        d += d2;
-        y += sy;
-      }
-      else
-        d += d1;
-      mlx_pixel_put(mlx, win, x, y, color);
+      err = err - d.y;
+      c1.x = c1.x + sx;
+    }
+    else
+    {
+      err = err + d.x;
+      c1.y = c1.y + sy;
     }
   }
-  else
+}
+
+static  void  ft_draw_img(t_st *fdf, int y, t_coor ctr)
+{
+  int     x;
+  t_coor  c1;
+  t_coor  c2;
+
+  x = 0;
+  while (x < fdf->w)
   {
-    int d = (dx << 1) - dy;
-    int d1 = dx << 1;
-    int d2 = (dx - dy) << 1;
-    mlx_pixel_put(mlx, win, x0, y0, color);
-    for(int y = y0 + sy, x = x0, i = 1; i <= dy; i++, y += sy)
-    {
-      if ( d >0)
-      {
-        d += d2;
-        x += sx;
-      }
-      else
-        d += d1;
-      mlx_pixel_put(mlx, win, x, y, color);
-    }
+    c1 = ft_init_c1_x(fdf, y, x, c1);
+    c2 = ft_init_c2_x(fdf, y, x, c2);
+    if (x != fdf->w - 1)
+      ft_draw_line(*fdf, ft_rotate(c1, *fdf, ctr), ft_rotate(c2, *fdf, ctr));
+    c1 = ft_init_c1_y(fdf, y, x, c1);
+    c2 = ft_init_c2_y(fdf, y, x, c2);
+    if (y != fdf->h - 1)
+      ft_draw_line(*fdf, ft_rotate(c1, *fdf, ctr), ft_rotate(c2, *fdf, ctr));
+    x++;
   }
 }
 
-/*void	ft_init_coord_par(t_st *st)
+void	ft_prepare_to_draw(t_st *fdf)
 {
-	t_coord	*current;
-	float	tmp;
+  int     y;
+  t_coor  ctr;
 
-	current = st->list;
-	tmp = 0;
-	while (current)
-	{
-		tmp = 500 + (current->x * 50) * st->zoom + CONST *	(current->z * -3) * st->zoom;
-		current->x = (int)(tmp + 0.5);
-		tmp = 300 + (current->y * 50) * st->zoom + (CONST / 2) * (current->z * -3) * st->zoom;
-		current->y = (int)(tmp + 0.5);
-		current = current->next;
-	}
-}*/
-
-void	ft_input_to_draw(t_st *st, t_coord *first, t_coord *second)
-{
-	int 	x_first;
-	int 	x_second;
-	int 	y_first;
-	int 	y_second;	
-
-//	ft_init_coord_par(st);
-	x_first = first->x;
-	y_first = first->y;
-	x_second = second->x;
-	y_second = second->y;
-	ft_bresen(st->win, st->mlx, x_first, y_first, x_second, y_second, ROSE);
+  ctr.x = 800;
+  ctr.y = 500;
+  ctr.z = 0;
+  y = 0;
+  if (fdf->zoom < 0)
+    fdf->zoom = 0;
+  while (y < fdf->h)
+  {
+    ft_draw_img(fdf, y, ctr);
+    y++;
+  }
 }
 
-int 	ft_count_width(t_st *st)
+void	ft_draw(t_st *fdf)
 {
-	t_coord	*current;
+  int bpp;
+  int sl;
+  int e;
 
-	current = st->list;
-	while (current->next && current->y == current->next->y)
-		current = current->next;
-	return (current->x);
-}
-
-void    color_brain(t_coord *head, t_coord *first, t_coord *second)
-{
-  int x1;
-  int y0;
-  int z0;
-  int z1;
-  int *arr;
-
-  arr = malloc(sizeof((int*)4));
-  y0 = ((first->y - head->height / 2) PY) * cos(head->rotx) + ((first->z - head->cz) PZ) * sin(head->rotx) + (head->height / 2) PY + head->plus_h;
-  z0 = ((first->z - head->cz) PZ) * cos(head->rotx) - ((first->y - head->height / 2) PY) * sin(head->rotx) + head->cz PZ;
-  x1 = ((first->x - head->width / 2) PX) * cos(head->roty) - (z0 - head->cz) * sin(head->roty) + (head->width / 2) PX + head->plus_w;
-  z1 = (z0 - head->cz) * cos(head->roty) + (first->x - head->width / 2) * sin(head->roty) + head->cz;
-  arr[0] = (x1 - head->width / 2) * cos(head->rotz) + (y0 - head->height / 2) * sin(head->rotz) + head->width / 2;
-  arr[1] = (y0 - head->height / 2) * cos(head->rotz) - (x1 - head->width / 2) * sin(head->rotz) + head->height / 2;
-  y0 = ((second->y - head->height / 2) PY) * cos(head->rotx) + ((second->z - head->cz) PZ) * sin(head->rotx) + (head->height / 2) PY + head->plus_h;
-  z0 = ((second->z - head->cz) PZ) * cos(head->rotx) - ((second->y - head->height / 2) PY) * sin(head->rotx) + head->cz PZ;
-  x1 = ((second->x - head->width / 2) PX) * cos(head->roty) - (z0 - head->cz) * sin(head->roty) + (head->width / 2) PX + head->plus_w;
-  z1 = (z0 - head->cz) * cos(head->roty) + (second->x - head->width / 2) * sin(head->roty) + head->cz;
-  arr[2] = (x1 - head->width / 2) * cos(head->rotz) + (y0 - head->height / 2) * sin(head->rotz) + head->width / 2;
-  arr[3] = (y0 - head->height / 2) * cos(head->rotz) - (x1 - head->width / 2) * sin(head->rotz) + head->height / 2;
-
-  // arr = transform(head, first, second);
-  ft_line(head, arr, first->color, second->color, first, second);
-  free(arr);
-}
-
-void	ft_draw_img(t_st *st)
-{
-	t_coord *first;
-	t_coord	*second;
-
-	first = st->list;
-	
-//	ft_putnbr(st->w);
-//	ft_putnbr(st->list->x);
-	ft_init_coord_par(st);
-	st->w = ft_count_width(st);
-//	ft_putnbr(st->w);
-//	ft_putchar('\n');
-	while (first->next)
-	{
-		if (first->next->next && first->x != st->w)
-			ft_input_to_draw(st, first, first->next);
-//		ft_putnbr(first->y);
-//		ft_putchar('\n');
-		second = first->next;
-		while (second)
-		{
-			if (first->x == second->x)
-			{
-				ft_input_to_draw(st, first, second);
-				break ;
-			}
-			second = second->next;
-		}
-		first = first->next;
-	}
-}
-
-void	ft_draw(t_st *st)
-{
-//	int	bpp;
-//	int	sl;
-//	int	e;
-
-	st->rx = 8;
-	st->ry = 0;
-	st->rz = -0;
-	st->right = 1460;
-	st->top = -620;
-	st->zoom = 1;
-	st->z = 0;
-	st->color = 0xDB7093;
-	st->img = mlx_new_image(st->mlx, 1800, 1050);
-//	st->grid = (int*)mlx_get_data_addr(st->img, &bpp, &sl, &e);
-	ft_draw_img(st);
-//	mlx_put_image_to_window(st->mlx, st->win, st->img, 0, 0);
+	fdf->right = 500;
+	fdf->top = 0;
+	fdf->zoom = 50;
+	fdf->z = 2;
+	fdf->color = 0xDB7093;
+  fdf->rx = 8.4;
+  fdf->ry = 0.6;
+  fdf->rz = -0.5;
+	fdf->img = mlx_new_image(fdf->mlx, 1600, 1000);
+	fdf->grid = (int*)mlx_get_data_addr(fdf->img, &bpp, &sl, &e);
+	ft_prepare_to_draw(fdf);
+  ft_bars(fdf);
+	mlx_put_image_to_window(fdf->mlx, fdf->win, fdf->img, 0, 0);
+  ft_text_instructions(fdf);
+  ft_key_control(fdf);
+  mlx_loop(fdf->mlx);
 }

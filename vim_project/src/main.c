@@ -14,38 +14,20 @@
 
 int		main(int ac, char **av)
 {
-	t_st 	*st;
-//	int 	loop = 1;
+	t_st 	*fdf;
+
 	if (ac < 2)
-//Checking file name
 	{
 		ft_putendl("File name missing (use: ./fdf file_name)");
 		return (1);
 	}
-	if (!(st = ft_init_st()))
-//Creating stuct st and init it
-//Creating win
-		return (1);
-	ft_read(st, av[1]);
-/*	while (st->list)
+	if (!(fdf = ft_init_fdf()))
 	{
-		ft_putnbr(st->list->z);
-		if (st->list->z > 9)
-			ft_putchar(' ');
-		else
-			ft_putstr("  ");
-		st->list = st->list->next;
-		if (loop % 19 == 0)
-			ft_putchar('\n');
-		loop++;
-	}*/
-//Creating chained list in struct s_st->list
-	ft_text_instructions(st->mlx, st->win);
-//Display all instructions in left top corner
-	ft_key_control(st);
-//Key setup
-	ft_draw(st);
-//Draw chained list
-	mlx_loop(st->mlx);
+		free(fdf);
+		return (1);
+	}
+	ft_read(fdf, av[1]);
+	ft_draw(fdf);
+	system("leaks fdf");
 	return (0);
 }

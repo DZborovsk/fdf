@@ -14,57 +14,55 @@
 # define FDF_H
 
 # include "../libft/libft.h"
-# include <mlx.h>
+# include "../minilibx_macos/mlx.h"
 # include <math.h>
 
-# define CONST 0.5
 # define TEXT_COLOR 0xCD3700
 # define ROSE 0xDB7093
 # define RED 0xCD3700
 # define BLUE 0xa020f0
 
-typedef struct 		s_coord
+typedef struct 		s_coor
 {
 	int				y;
 	int				x;
 	int				z;
-	struct s_coord	*next;
-}					t_coord;
+}					t_coor;
 
 typedef struct 		s_st
 {
-	t_coord			*list;
 	void			*mlx;
 	void			*win;
 	void			*img;
+	int 			**matrix;
 	float			zoom;
 	int				w;
 	int				h;
 	int				z;
-	int 			rx;
-	int 			ry;
-	int 			rz;
+	double 			rx;
+	double 			ry;
+	double 			rz;
 	int 			right;
 	int 			top;
 	int 			color;
 	int 			*grid;
 }					t_st;
 
-t_coord	*ft_add_node(t_coord *current, int x, int y, int z);
-t_coord	*ft_make_line(t_coord *begin, char *line, int y);
+t_st	*ft_init_fdf(void);
 void 	ft_read(t_st *st, char *file);
-void	ft_verif_value(t_st *st);
-t_st	*ft_init_st(void);
-void	ft_key_control(t_st *st);
-void	ft_text_instructions(void *mlx, void *win);
-int 	ft_key_hook(int keycode, t_st *st);
-//int		ft_zoom(int keycode, t_st *st);
-void	ft_free_list(t_coord *begin);
-int		ft_exit(void);
-void	ft_draw(t_st *st);
-int 	ft_count_width(t_st *st);
-void	ft_input_to_draw(t_st *st, t_coord *first, t_coord *second);
-void	ft_init_coord_par(t_st *st);
-void ft_bresen(void *win, void *mlx, int x0, int y0, int x1, int y1, int color);
+int		ft_size_of_array(char **arr);
+void	ft_free_split(char **split);
+void	ft_free_list(t_list *begin);
+int		ft_exit(t_st *fdf);
+void	ft_key_control(t_st *fdf);
+void	ft_draw(t_st *fdf);
+void	ft_prepare_to_draw(t_st *fdf);
+t_coor	ft_init_c1_x(t_st *fdf, int y, int x, t_coor c1);
+t_coor	ft_init_c2_x(t_st *fdf, int y, int x, t_coor c2);
+t_coor	ft_init_c1_y(t_st *fdf, int y, int x, t_coor c1);
+t_coor	ft_init_c2_y(t_st *fdf, int y, int x, t_coor c2);
+void  	ft_put_pixel_to_img(t_st *fdf, int x, int y, int color);
+void	ft_text_instructions(t_st *fdf);
+void	ft_bars(t_st *fdf);
 
 #endif
