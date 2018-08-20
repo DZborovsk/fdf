@@ -5,8 +5,8 @@
 #                                                     +:+ +:+         +:+      #
 #    By: dzborovk <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2018/06/28 15:44:13 by dzborovk          #+#    #+#              #
-#    Updated: 2018/07/19 12:54:57 by dzborovk         ###   ########.fr        #
+#    Created: 2018/08/20 10:30:15 by dzborovk          #+#    #+#              #
+#    Updated: 2018/08/20 11:10:31 by dzborovk         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,7 +26,8 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	make -C libft/
-	gcc -Wall -Wextra -Werror -L libft/ -lft -g -L minilibx_macos/ -lmlx -framework OpenGL -framework AppKit $(SRC) -o $(NAME)
+	gcc -Wall -Wextra -Werror -L libft/ -lft -g -L /usr/local/lib/ -lmlx -framework OpenGL -framework AppKit $(SRC) -o $(NAME)
+	rm -rf fdf.dSYM
 	printf '\033[32m[ ✔ ] %s\n\033[0m' "Create FdF"
 
 obj/%.o: src/%.c

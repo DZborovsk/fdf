@@ -1,10 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   read.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dzborovk <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/08/20 10:22:08 by dzborovk          #+#    #+#             */
+/*   Updated: 2018/08/20 10:23:39 by dzborovk         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "../include/fdf.h"
 
 static	void	ft_add_line(t_st *fdf, int y, char *line)
 {
 	int		x;
-	char 	**split;
+	char	**split;
 
 	x = 0;
 	split = ft_strsplit(line, ' ');
@@ -20,8 +31,8 @@ static	void	ft_add_line(t_st *fdf, int y, char *line)
 
 static	void	ft_read_to_fdf(t_st *fdf, t_list *begin)
 {
-	int 	line_nbr;
-	t_list *current;
+	int		line_nbr;
+	t_list	*current;
 
 	current = begin;
 	fdf->matrix = (int**)malloc(sizeof(int*) * fdf->h);
@@ -56,7 +67,7 @@ static	t_list	*ft_add_first_node(t_list *begin, char *line)
 	return (begin);
 }
 
-void	ft_read(t_st *fdf, char *file)
+void			ft_read(t_st *fdf, char *file)
 {
 	int		fd;
 	t_list	*line;
@@ -84,4 +95,3 @@ void	ft_read(t_st *fdf, char *file)
 	}
 	ft_read_to_fdf(fdf, begin);
 }
-

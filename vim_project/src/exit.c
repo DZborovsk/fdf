@@ -6,13 +6,13 @@
 /*   By: dzborovk <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/22 17:20:46 by dzborovk          #+#    #+#             */
-/*   Updated: 2018/07/22 17:20:48 by dzborovk         ###   ########.fr       */
+/*   Updated: 2018/08/20 10:08:41 by dzborovk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/fdf.h"
 
-int		ft_size_of_array(char **arr)
+int				ft_size_of_array(char **arr)
 {
 	int		l;
 
@@ -22,7 +22,7 @@ int		ft_size_of_array(char **arr)
 	return (l);
 }
 
-void	ft_free_split(char **split)
+void			ft_free_split(char **split)
 {
 	int		index;
 
@@ -35,10 +35,10 @@ void	ft_free_split(char **split)
 	free(split);
 }
 
-void	ft_free_list(t_list *begin)
+void			ft_free_list(t_list *begin)
 {
 	t_list	*tmp;
-	void 	*content;
+	void	*content;
 
 	tmp = begin;
 	content = begin->content;
@@ -65,7 +65,7 @@ static	void	ft_free_matrix_lines(t_st *fdf)
 	free(fdf->matrix);
 }
 
-int		ft_exit(t_st *fdf)
+int				ft_exit(t_st *fdf)
 {
 	mlx_destroy_window(fdf->mlx, fdf->win);
 	ft_free_matrix_lines(fdf);
